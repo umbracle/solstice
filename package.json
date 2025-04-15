@@ -1,0 +1,236 @@
+{
+  "name": "solstice-language-server",
+  "description": "nano rust language server",
+  "license": "MIT",
+  "version": "1.5.0",
+  "categories": [],
+  "keywords": [
+    "language-server",
+    "tower-lsp"
+  ],
+  "repository": {
+    "url": "https://github.com/IWANABETHATGUY/tower-lsp-boilerplate"
+  },
+  "engines": {
+    "vscode": "^1.66.0"
+  },
+  "enabledApiProposals": [],
+  "activationEvents": [
+    "onLanguage:sol"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "sol",
+        "extensions": [
+          ".sol"
+        ],
+        "aliases": [
+          "Solidity"
+        ],
+        "configuration": "./solidity.configuration.json"
+      },
+      {
+        "id": "foundry.toml",
+        "filenames": [
+          "foundry.toml"
+        ],
+        "aliases": [
+          "Foundry configuration file"
+        ]
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "sol"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sol.startDebug",
+        "title": "Start Debug Session"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "sol-language-server",
+      "properties": {
+        "sol-language-server.trace.server": {
+          "type": "string",
+          "scope": "window",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "enumDescriptions": [
+            "No traces",
+            "Error only",
+            "Full log"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
+      }
+    },
+    "grammars": [
+      {
+        "language": "sol",
+        "scopeName": "source.solidity",
+        "path": "./syntax/solidity.json",
+        "balancedBracketScopes": [
+          "*"
+        ],
+        "unbalancedBracketScopes": [
+          "meta.scope.case-pattern.solidity"
+        ]
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "mock",
+        "languages": [
+          "sol"
+        ],
+        "label": "Mock Debug",
+        "runtime": "node",
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Absolute path to a text file.",
+                "default": "${workspaceFolder}/${command:AskForProgramName}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after launch.",
+                "default": true
+              },
+              "trace": {
+                "type": "boolean",
+                "description": "Enable logging of the Debug Adapter Protocol.",
+                "default": true
+              },
+              "compileError": {
+                "type": "string",
+                "description": "Simulates a compile error in 'launch' request.",
+                "enum": [
+                  "default",
+                  "show",
+                  "hide"
+                ],
+                "enumDescriptions": [
+                  "default: show fake compile error to user",
+                  "show fake compile error to user",
+                  "do not show fake compile error to user"
+                ]
+              }
+            }
+          },
+          "attach": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Absolute path to a text file.",
+                "default": "${workspaceFolder}/${command:AskForProgramName}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after attach.",
+                "default": true
+              },
+              "trace": {
+                "type": "boolean",
+                "description": "Enable logging of the Debug Adapter Protocol.",
+                "default": true
+              },
+              "compileError": {
+                "type": "string",
+                "description": "Simulates a compile error in 'attach' request.",
+                "enum": [
+                  "default",
+                  "show",
+                  "hide"
+                ],
+                "enumDescriptions": [
+                  "default: show fake compile error to user",
+                  "show fake compile error to user",
+                  "do not show fake compile error to user"
+                ]
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "mock",
+            "request": "launch",
+            "name": "Ask for file name",
+            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Mock Debug: Launch",
+            "description": "A new configuration for 'debugging' a user selected markdown file.",
+            "body": {
+              "type": "mock",
+              "request": "launch",
+              "name": "Ask for file name",
+              "program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
+              "stopOnEntry": true
+            }
+          }
+        ],
+        "variables": {
+          "AskForProgramName": "extension.mock-debug.getProgramName"
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "postinstall": "cd client && pnpm i",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "test-compile": "tsc -p ./",
+    "compile": "cross-env NODE_ENV=production tsc -b",
+    "watch": "rm -rf dist && tsc -b -w",
+    "lint": "eslint src --ext ts",
+    "pretest": "npm run compile && npm run lint",
+    "test": "node ./out/test/runTest.js",
+    "build": "webpack --config webpack.config.js",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^12.12.0",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "cross-env": "^7.0.2",
+    "electron-rebuild": "^1.11.0",
+    "eslint": "^7.6.0",
+    "glob": "^7.1.7",
+    "mocha": "^8.0.1",
+    "typescript": "5.4.5",
+    "vscode-test": "^1.4.0",
+    "vscode-uri": "^3.0.2",
+    "webpack": "^5.82.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "vscode-debugadapter": "1.45.0",
+    "vscode-debugprotocol": "1.45.0",
+    "vscode-languageclient": "9.0.1"
+  },
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
+}

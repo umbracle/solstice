@@ -1,0 +1,24 @@
+(contract
+  (state-vars
+    value
+  )
+  (function main
+    (params )
+    (block
+      (block
+        (stmt 171:13)
+        (stmt 171:13)
+      )
+      (block
+        (stmt 307:22)
+        (stmt 307:22)
+      )
+    )
+  )
+  (function simple_call
+    (params )
+    (block
+      (stmt 415:8)
+    )
+  )
+)
