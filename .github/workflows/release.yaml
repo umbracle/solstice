@@ -20,10 +20,15 @@ jobs:
         id: extract_version
       - name: Validate version matches Cargo.toml
         run: |
-          CARGO_VERSION=$(grep -m 1 '^version = ' Cargo.toml | cut -d '"' -f 2)
           TAG_VERSION=${{ steps.extract_version.outputs.VERSION }}
-          if [ "$CARGO_VERSION" != "$TAG_VERSION" ]; then
-            echo "Version mismatch: Cargo.toml has $CARGO_VERSION but tag is $TAG_VERSION"
+          if [[ ! "$TAG_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag version must start with 'v' and follow semantic versioning (e.g. v1.2.3)"
+            exit 1
+          fi
+          CARGO_VERSION=$(grep -m 1 '^version = ' Cargo.toml | cut -d '"' -f 2)
+          TAG_VERSION_WITHOUT_V=${TAG_VERSION#v}
+          if [ "$CARGO_VERSION" != "$TAG_VERSION_WITHOUT_V" ]; then
+            echo "Version mismatch: Cargo.toml has $CARGO_VERSION but tag is $TAG_VERSION_WITHOUT_V"
             exit 1
           fi
     outputs:
